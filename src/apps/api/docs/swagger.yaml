@@ -1,0 +1,457 @@
+basePath: /api
+definitions:
+  request.CreateAccount:
+    properties:
+      birth_date:
+        type: string
+      cpf:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      role_code:
+        type: string
+    type: object
+  request.CreatePasswordReset:
+    properties:
+      email:
+        type: string
+    type: object
+  request.Credentials:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  request.UpdateAccountProfile:
+    properties:
+      birth_date:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  request.UpdatePassword:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        type: string
+    type: object
+  request.UpdatePasswordByPasswordReset:
+    properties:
+      new_password:
+        type: string
+    type: object
+  response.Account:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      professional:
+        $ref: '#/definitions/response.Professional'
+      profile:
+        $ref: '#/definitions/response.Person'
+      role:
+        $ref: '#/definitions/response.Role'
+    type: object
+  response.Authorization:
+    properties:
+      access_token:
+        type: string
+    type: object
+  response.ErrorMessage:
+    properties:
+      error: {}
+      invalid_fields:
+        items:
+          $ref: '#/definitions/response.InvalidField'
+        type: array
+      message:
+        type: string
+      status_code:
+        type: integer
+    type: object
+  response.ID:
+    properties:
+      id:
+        type: string
+    type: object
+  response.InvalidField:
+    properties:
+      description:
+        type: string
+      field_name:
+        type: string
+    type: object
+  response.Person:
+    properties:
+      birth_date:
+        type: string
+      cpf:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.Professional:
+    properties:
+      id:
+        type: string
+    type: object
+  response.Role:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+info:
+  contact:
+    email: gjs8@aluno.ifal.edu.br
+    name: STARTI - PROJETOS E CONSULTORIA
+  description: Locadora de Imóveis API
+  title: Locadora de Imóveis API
+  version: "1.0"
+paths:
+  /accounts/profile:
+    get:
+      description: |-
+        Esta rota retorna todas as informações de todas as contas cadastradas no banco de dados.
+        Dados como "professional" irão somente aparecer caso a role da conta for própria para contenção desses.
+      operationId: Accounts.FindProfile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Requisição realizada com sucesso.
+          schema:
+            $ref: '#/definitions/response.Account'
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - bearerAuth: []
+      summary: Pesquisar dados do perfil de uma conta.
+      tags:
+      - Geral
+    put:
+      consumes:
+      - application/json
+      operationId: Account.UpdateProfile
+      parameters:
+      - description: JSON com todos os dados necessários para o processo de atualização
+          de dados do perfil.
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateAccountProfile'
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - bearerAuth: []
+      summary: Atualizar dados do perfil de uma conta.
+      tags:
+      - Geral
+  /accounts/update-password:
+    put:
+      consumes:
+      - application/json
+      operationId: Account.UpdateAccountPassword
+      parameters:
+      - description: JSON com todos os dados necessários para a atualização da senha
+          da conta.
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdatePassword'
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - bearerAuth: []
+      summary: Realizar a atualização de senha de uma conta.
+      tags:
+      - Geral
+  /admin/accounts:
+    get:
+      description: |-
+        Esta rota retorna todas as informações de todas as contas cadastradas no banco de dados.
+        Dados como "professional" irão somente aparecer caso a role da conta for própria para contenção desses.
+      operationId: Accounts.List
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Requisição realizada com sucesso.
+          schema:
+            items:
+              $ref: '#/definitions/response.Account'
+            type: array
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - bearerAuth: []
+      summary: Listar todas as contas existentes do banco de dados.
+      tags:
+      - Administrador
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Ao enviar dados para cadastro de uma nova conta, os dados relacionados à "Profissional"
+        são facultativos, tendo somente que enviar os dados que são relacionados à role definida.
+      operationId: Accounts.Create
+      parameters:
+      - description: JSON com todos os dados necessários para o cadastro de uma conta
+          de usuário.
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateAccount'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Requisição realizada com sucesso.
+          schema:
+            $ref: '#/definitions/response.ID'
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - bearerAuth: []
+      summary: Cadastrar uma nova conta de usuário
+      tags:
+      - Administrador
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      operationId: Auth.Login
+      parameters:
+      - description: JSON com todos os dados necessários para o processo de autenticação.
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/request.Credentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Requisição realizada com sucesso.
+          schema:
+            $ref: '#/definitions/response.Authorization'
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Adquirir autorização de acesso aos recursos da API através de credenciais
+        de uma conta.
+      tags:
+      - Anônimo
+  /auth/logout:
+    post:
+      operationId: Auth.Logout
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Requisição realizada com sucesso.
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Remove a sessão do registro de sessões permitidas.
+      tags:
+      - Geral
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        cadastra uma nova entrada para a entidade `password_reset` vinculada à conta da sessão
+        e envia um e-mail para o email dessa.
+      operationId: Auth.PasswordReset
+      parameters:
+      - description: JSON com todos os dados necessários para resetar a senha por
+          email.
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreatePasswordReset'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Solicitar email com token para atualização de senha.
+      tags:
+      - Anônimo
+  /auth/reset-password/{token}:
+    get:
+      consumes:
+      - application/json
+      operationId: Auth.FindPasswordResetByToken
+      parameters:
+      - description: Token recebido pelo email da conta do usuário da plataforma.
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Verificar a existência de uma solicitação de atualização de senha por
+        token.
+      tags:
+      - Anônimo
+    put:
+      consumes:
+      - application/json
+      operationId: Auth.UpdatePasswordByPasswordReset
+      parameters:
+      - description: Token recebido pelo email da conta do usuário da plataforma.
+        in: path
+        name: token
+        required: true
+        type: string
+      - description: JSON com todos os dados necessários para resetar a senha por
+          email.
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdatePasswordByPasswordReset'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Atualizar a senha de uma conta a partir de um token de atualização
+        de senha.
+      tags:
+      - Anônimo
+  /res/account-roles:
+    get:
+      description: |-
+        Pode ser utilizada para visualizar as funções de conta cadastradas no banco de dados e adquirir o
+        identificador da função desejada para a criação de uma nova conta.
+      operationId: Resources.ListAccountRoles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Requisição realizada com sucesso.
+          schema:
+            items:
+              $ref: '#/definitions/response.Role'
+            type: array
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      security:
+      - bearerAuth: []
+      summary: Listar todas as funções de conta existentes do banco de dados.
+      tags:
+      - Recursos
+securityDefinitions:
+  bearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
