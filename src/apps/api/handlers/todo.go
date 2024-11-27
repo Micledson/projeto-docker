@@ -127,7 +127,7 @@ func (t todo) Update(context RichContext) error {
 		response.ErrorBuilder().NewUnsupportedMediaTypeError()
 	}
 
-	requestDto.ID = id
+	requestDto.ID = *id
 	todoDomain, dtoErr := requestDto.ToDomain()
 	if dtoErr != nil {
 		response.ErrorBuilder().NewFromDomain(dtoErr)

@@ -8,16 +8,16 @@ import (
 )
 
 type Todo struct {
-	ID          *uuid.UUID `json:"id"`
-	Description string     `json:"description"`
-	IsActive    bool       `json:"is_active"`
+	ID          uuid.UUID `json:"id"`
+	Description string    `json:"description"`
+	IsActive    bool      `json:"is_active"`
 }
 
 func (t *Todo) ToDomain() (todo.Todo, errors.Error) {
 	builder := todo.NewBuilder()
 
-	if validator.IsUUIDValid(*t.ID) {
-		builder.WithID(*t.ID)
+	if validator.IsUUIDValid(t.ID) {
+		builder.WithID(t.ID)
 	}
 
 	_todo, err := builder.
