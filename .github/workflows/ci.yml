@@ -62,6 +62,21 @@ jobs:
           docker build -t mcsl9/projeto-docker-api:${{ steps.generate_tag.outputs.sha }} \
             -f .docker/development/Dockerfile.api .
 
+      - name: Verificar diretórios e arquivos Dockerfile
+        run: |
+          echo "📂 Listando diretórios no nível raiz"
+          ls -l
+          
+          echo "📂 Listando conteúdo de .docker/"
+          ls -l .docker/
+          
+          echo "📂 Listando conteúdo de .docker/development/"
+          ls -l .docker/development/
+
+          echo "🔍 Verificando se os Dockerfiles existem"
+          [ -f .docker/development/Dockerfile.api ] && echo "✅ Dockerfile.api encontrado!" || echo "❌ Dockerfile.api NÃO encontrado!"
+          [ -f .docker/development/Dockerfile.postgres ] && echo "✅ Dockerfile.postgres encontrado!" || echo "❌ Dockerfile.postgres NÃO encontrado!"
+
       - name: Build da imagem Docker DATABASE
         run: |
           docker build -t mcsl9/projeto-docker-database:${{ steps.generate_tag.outputs.sha }} \
