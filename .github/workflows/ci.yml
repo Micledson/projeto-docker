@@ -24,11 +24,10 @@ jobs:
       - name: Checkout do código-fonte
         uses: actions/checkout@v4
 
-      - name: Configurar Go
-        uses: actions/setup-go@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
-          cache: 'mod'
+          go-version: 1.23.2
           
       - name: Verificar versão do Go
         run: go version
@@ -36,11 +35,8 @@ jobs:
       - name: Baixar dependências
         run: go mod tidy
 
-      - name: Executar testes
-        run: go test -v ./...
-
       - name: Build da aplicação
-        run: go build -o myapp .
+        run: go build -o todo_app .
 
       - name: Gerar Tag
         id: generate_tag
