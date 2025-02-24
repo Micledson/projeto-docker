@@ -60,10 +60,10 @@ jobs:
       #       -f .docker/development/Dockerfile.api .
 
       - name: ls da pasta
-        run: ls config/
+        run: ls config/database/postgres/migrations/
         
       - name: ls da pasta
-        run: ls config/database/postgres/
+        run: ls config/database/postgres/migrations/fixtures
         
       - name: Build da imagem Docker DATABASE
         run: |
