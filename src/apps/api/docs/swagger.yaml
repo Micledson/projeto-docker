@@ -1,70 +1,13 @@
 basePath: /api
 definitions:
-  request.CreateAccount:
+  request.Todo:
     properties:
-      birth_date:
-        type: string
-      cpf:
-        type: string
-      email:
-        type: string
-      name:
-        type: string
-      phone:
-        type: string
-      role_code:
-        type: string
-    type: object
-  request.CreatePasswordReset:
-    properties:
-      email:
-        type: string
-    type: object
-  request.Credentials:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    type: object
-  request.UpdateAccountProfile:
-    properties:
-      birth_date:
-        type: string
-      name:
-        type: string
-      phone:
-        type: string
-    type: object
-  request.UpdatePassword:
-    properties:
-      current_password:
-        type: string
-      new_password:
-        type: string
-    type: object
-  request.UpdatePasswordByPasswordReset:
-    properties:
-      new_password:
-        type: string
-    type: object
-  response.Account:
-    properties:
-      email:
+      description:
         type: string
       id:
         type: string
-      professional:
-        $ref: '#/definitions/response.Professional'
-      profile:
-        $ref: '#/definitions/response.Person'
-      role:
-        $ref: '#/definitions/response.Role'
-    type: object
-  response.Authorization:
-    properties:
-      access_token:
-        type: string
+      is_active:
+        type: boolean
     type: object
   response.ErrorMessage:
     properties:
@@ -78,11 +21,6 @@ definitions:
       status_code:
         type: integer
     type: object
-  response.ID:
-    properties:
-      id:
-        type: string
-    type: object
   response.InvalidField:
     properties:
       description:
@@ -90,136 +28,31 @@ definitions:
       field_name:
         type: string
     type: object
-  response.Person:
+  response.Todo:
     properties:
-      birth_date:
-        type: string
-      cpf:
-        type: string
       created_at:
         type: string
-      email:
+      description:
         type: string
       id:
         type: string
-      name:
-        type: string
-      phone:
-        type: string
+      is_active:
+        type: boolean
       updated_at:
-        type: string
-    type: object
-  response.Professional:
-    properties:
-      id:
-        type: string
-    type: object
-  response.Role:
-    properties:
-      code:
-        type: string
-      id:
-        type: string
-      name:
         type: string
     type: object
 info:
   contact:
-    email: gjs8@aluno.ifal.edu.br
-    name: STARTI - PROJETOS E CONSULTORIA
-  description: Locadora de Imóveis API
-  title: Locadora de Imóveis API
+    email: projeto@email.com
+    name: Projeto - docker
+  description: Todo API
+  title: Todo API
   version: "1.0"
 paths:
-  /accounts/profile:
+  /todo:
     get:
-      description: |-
-        Esta rota retorna todas as informações de todas as contas cadastradas no banco de dados.
-        Dados como "professional" irão somente aparecer caso a role da conta for própria para contenção desses.
-      operationId: Accounts.FindProfile
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Requisição realizada com sucesso.
-          schema:
-            $ref: '#/definitions/response.Account'
-        "500":
-          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-        "503":
-          description: A base de dados está temporariamente indisponível.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-      security:
-      - bearerAuth: []
-      summary: Pesquisar dados do perfil de uma conta.
-      tags:
-      - Geral
-    put:
-      consumes:
-      - application/json
-      operationId: Account.UpdateProfile
-      parameters:
-      - description: JSON com todos os dados necessários para o processo de atualização
-          de dados do perfil.
-        in: body
-        name: json
-        required: true
-        schema:
-          $ref: '#/definitions/request.UpdateAccountProfile'
-      responses:
-        "200":
-          description: OK
-        "500":
-          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-        "503":
-          description: A base de dados está temporariamente indisponível.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-      security:
-      - bearerAuth: []
-      summary: Atualizar dados do perfil de uma conta.
-      tags:
-      - Geral
-  /accounts/update-password:
-    put:
-      consumes:
-      - application/json
-      operationId: Account.UpdateAccountPassword
-      parameters:
-      - description: JSON com todos os dados necessários para a atualização da senha
-          da conta.
-        in: body
-        name: json
-        required: true
-        schema:
-          $ref: '#/definitions/request.UpdatePassword'
-      responses:
-        "200":
-          description: OK
-        "500":
-          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-        "503":
-          description: A base de dados está temporariamente indisponível.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-      security:
-      - bearerAuth: []
-      summary: Realizar a atualização de senha de uma conta.
-      tags:
-      - Geral
-  /admin/accounts:
-    get:
-      description: |-
-        Esta rota retorna todas as informações de todas as contas cadastradas no banco de dados.
-        Dados como "professional" irão somente aparecer caso a role da conta for própria para contenção desses.
-      operationId: Accounts.List
+      description: Esta rota retorna todas os ToDos.
+      operationId: Todo.List
       produces:
       - application/json
       responses:
@@ -227,8 +60,13 @@ paths:
           description: Requisição realizada com sucesso.
           schema:
             items:
-              $ref: '#/definitions/response.Account'
+              $ref: '#/definitions/response.Todo'
             type: array
+        "422":
+          description: Algum dos dados informados não pôde ser processado. Verifique
+            os dados fornecidos.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
         "500":
           description: Ocorreu um erro inesperado. Por favor, contate o suporte.
           schema:
@@ -237,65 +75,33 @@ paths:
           description: A base de dados está temporariamente indisponível.
           schema:
             $ref: '#/definitions/response.ErrorMessage'
-      security:
-      - bearerAuth: []
-      summary: Listar todas as contas existentes do banco de dados.
+      summary: Lista todos os ToDos ativos.
       tags:
-      - Administrador
+      - Todo
     post:
-      consumes:
-      - application/json
-      description: |-
-        Ao enviar dados para cadastro de uma nova conta, os dados relacionados à "Profissional"
-        são facultativos, tendo somente que enviar os dados que são relacionados à role definida.
-      operationId: Accounts.Create
+      description: Esta rota Cria um ToDo.
+      operationId: Todo.Create
       parameters:
-      - description: JSON com todos os dados necessários para o cadastro de uma conta
-          de usuário.
+      - description: Parametros necessários para inserir um ToDo.
         in: body
         name: json
         required: true
         schema:
-          $ref: '#/definitions/request.CreateAccount'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Requisição realizada com sucesso.
-          schema:
-            $ref: '#/definitions/response.ID'
-        "500":
-          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-        "503":
-          description: A base de dados está temporariamente indisponível.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-      security:
-      - bearerAuth: []
-      summary: Cadastrar uma nova conta de usuário
-      tags:
-      - Administrador
-  /auth/login:
-    post:
-      consumes:
-      - application/json
-      operationId: Auth.Login
-      parameters:
-      - description: JSON com todos os dados necessários para o processo de autenticação.
-        in: body
-        name: json
-        required: true
-        schema:
-          $ref: '#/definitions/request.Credentials'
+          $ref: '#/definitions/request.Todo'
       produces:
       - application/json
       responses:
         "200":
           description: Requisição realizada com sucesso.
           schema:
-            $ref: '#/definitions/response.Authorization'
+            items:
+              $ref: '#/definitions/response.Todo'
+            type: array
+        "422":
+          description: Algum dos dados informados não pôde ser processado. Verifique
+            os dados fornecidos.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
         "500":
           description: Ocorreu um erro inesperado. Por favor, contate o suporte.
           schema:
@@ -304,18 +110,27 @@ paths:
           description: A base de dados está temporariamente indisponível.
           schema:
             $ref: '#/definitions/response.ErrorMessage'
-      summary: Adquirir autorização de acesso aos recursos da API através de credenciais
-        de uma conta.
+      summary: Cria um ToDo.
       tags:
-      - Anônimo
-  /auth/logout:
-    post:
-      operationId: Auth.Logout
-      produces:
-      - application/json
+      - Todo
+  /todo/{id}:
+    delete:
+      description: Esta rota Deleta um ToDo.
+      operationId: Todo.DeleteToDo
+      parameters:
+      - description: UUID de um ToDo
+        in: path
+        name: id
+        required: true
+        type: string
       responses:
         "204":
-          description: Requisição realizada com sucesso.
+          description: Requisição realizada com sucesso
+        "422":
+          description: Algum dos dados informados não pôde ser processado. Verifique
+            os dados fornecidos.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
         "500":
           description: Ocorreu um erro inesperado. Por favor, contate o suporte.
           schema:
@@ -324,109 +139,18 @@ paths:
           description: A base de dados está temporariamente indisponível.
           schema:
             $ref: '#/definitions/response.ErrorMessage'
-      summary: Remove a sessão do registro de sessões permitidas.
+      summary: Deleta um ToDo.
       tags:
-      - Geral
-  /auth/reset-password:
-    post:
-      consumes:
-      - application/json
-      description: |-
-        cadastra uma nova entrada para a entidade `password_reset` vinculada à conta da sessão
-        e envia um e-mail para o email dessa.
-      operationId: Auth.PasswordReset
-      parameters:
-      - description: JSON com todos os dados necessários para resetar a senha por
-          email.
-        in: body
-        name: json
-        required: true
-        schema:
-          $ref: '#/definitions/request.CreatePasswordReset'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-        "500":
-          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-        "503":
-          description: A base de dados está temporariamente indisponível.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-      summary: Solicitar email com token para atualização de senha.
-      tags:
-      - Anônimo
-  /auth/reset-password/{token}:
+      - Todo
     get:
-      consumes:
-      - application/json
-      operationId: Auth.FindPasswordResetByToken
+      description: Esta rota retorna todas os ToDos.
+      operationId: Todo.GetByID
       parameters:
-      - description: Token recebido pelo email da conta do usuário da plataforma.
+      - description: UUID de um ToDo
         in: path
-        name: token
+        name: id
         required: true
         type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "500":
-          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-        "503":
-          description: A base de dados está temporariamente indisponível.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-      summary: Verificar a existência de uma solicitação de atualização de senha por
-        token.
-      tags:
-      - Anônimo
-    put:
-      consumes:
-      - application/json
-      operationId: Auth.UpdatePasswordByPasswordReset
-      parameters:
-      - description: Token recebido pelo email da conta do usuário da plataforma.
-        in: path
-        name: token
-        required: true
-        type: string
-      - description: JSON com todos os dados necessários para resetar a senha por
-          email.
-        in: body
-        name: json
-        required: true
-        schema:
-          $ref: '#/definitions/request.UpdatePasswordByPasswordReset'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "500":
-          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-        "503":
-          description: A base de dados está temporariamente indisponível.
-          schema:
-            $ref: '#/definitions/response.ErrorMessage'
-      summary: Atualizar a senha de uma conta a partir de um token de atualização
-        de senha.
-      tags:
-      - Anônimo
-  /res/account-roles:
-    get:
-      description: |-
-        Pode ser utilizada para visualizar as funções de conta cadastradas no banco de dados e adquirir o
-        identificador da função desejada para a criação de uma nova conta.
-      operationId: Resources.ListAccountRoles
       produces:
       - application/json
       responses:
@@ -434,8 +158,13 @@ paths:
           description: Requisição realizada com sucesso.
           schema:
             items:
-              $ref: '#/definitions/response.Role'
+              $ref: '#/definitions/response.Todo'
             type: array
+        "422":
+          description: Algum dos dados informados não pôde ser processado. Verifique
+            os dados fornecidos.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
         "500":
           description: Ocorreu um erro inesperado. Por favor, contate o suporte.
           schema:
@@ -444,11 +173,72 @@ paths:
           description: A base de dados está temporariamente indisponível.
           schema:
             $ref: '#/definitions/response.ErrorMessage'
-      security:
-      - bearerAuth: []
-      summary: Listar todas as funções de conta existentes do banco de dados.
+      summary: Retorna os detalhes de um ToDo
       tags:
-      - Recursos
+      - Todo
+    put:
+      description: Esta rota Atualiza a descrição de um ToDo.
+      operationId: Todo.Create
+      parameters:
+      - description: UUID de um ToDo
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Parametros necessários para inserir um ToDo.
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/request.Todo'
+      responses:
+        "204":
+          description: Requisição realizada com sucesso
+        "422":
+          description: Algum dos dados informados não pôde ser processado. Verifique
+            os dados fornecidos.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Atualização do ToDo.
+      tags:
+      - Todo
+  /todo/restore/{id}:
+    put:
+      description: Esta rota Restora um ToDo deletado.
+      operationId: Todo.RestoreToDo
+      parameters:
+      - description: UUID de um ToDo
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: Requisição realizada com sucesso
+        "422":
+          description: Algum dos dados informados não pôde ser processado. Verifique
+            os dados fornecidos.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "500":
+          description: Ocorreu um erro inesperado. Por favor, contate o suporte.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+        "503":
+          description: A base de dados está temporariamente indisponível.
+          schema:
+            $ref: '#/definitions/response.ErrorMessage'
+      summary: Restora um ToDo.
+      tags:
+      - Todo
 securityDefinitions:
   bearerAuth:
     in: header

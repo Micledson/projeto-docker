@@ -25,7 +25,7 @@ func main() {
 
 func getServerHostAndPort() (string, int) {
 	host := utils.GetenvWithDefault("SERVER_HOST", "0.0.0.0")
-	portStr := utils.GetenvWithDefault("SERVER_PORT", "8000")
+	portStr := utils.GetenvWithDefault("PORT", "8000")
 	var port int
 	if v, err := strconv.Atoi(portStr); err != nil {
 		log.Fatal("The server port env variable must be a number (e.g 8000)")
