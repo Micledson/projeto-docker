@@ -36,7 +36,7 @@ jobs:
         run: go mod tidy
 
       - name: Build da aplicação
-        run: go build -v ./src/apps/main.go
+        run: go build -v src/apps/main.go
 
       - name: Gerar Tag
         id: generate_tag
