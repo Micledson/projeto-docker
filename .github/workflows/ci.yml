@@ -29,17 +29,17 @@ jobs:
         with:
           go-version: 1.23.2
           
-      # - name: Verificar versão do Go
-      #   run: go version
+      - name: Verificar versão do Go
+        run: go version
 
-      # - name: Baixar dependências
-      #   run: go mod tidy
+      - name: Baixar dependências
+        run: go mod tidy
 
-      # - name: Build da aplicação
-      #   run: go build ./...
+      - name: Build da aplicação
+        run: go build ./...
 
-      # - name: Run Tests
-      #   run: go test ./...
+      - name: Run Tests
+        run: go test ./...
 
       - name: Gerar Tag
         id: generate_tag
@@ -48,22 +48,16 @@ jobs:
           echo "sha=$SHA" >> $GITHUB_OUTPUT
 
 
-      # - name: Login no Container Registry
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Login no Container Registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      # - name: Build da imagem Docker API
-      #   run: |
-      #     docker build -t mcsl9/projeto-docker-api:${{ steps.generate_tag.outputs.sha }} \
-      #       -f .docker/development/Dockerfile.api .
-
-      - name: ls da pasta
-        run: ls config/database/postgres/migrations/
-        
-      - name: ls da pasta
-        run: ls config/database/postgres/migrations/fixtures
+      - name: Build da imagem Docker API
+        run: |
+          docker build -t mcsl9/projeto-docker-api:${{ steps.generate_tag.outputs.sha }} \
+            -f .docker/development/Dockerfile.api .
         
       - name: Build da imagem Docker DATABASE
         run: |
