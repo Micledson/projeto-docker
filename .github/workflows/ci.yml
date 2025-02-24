@@ -62,5 +62,13 @@ jobs:
           docker build -t mcsl9/projeto-docker-api:${{ steps.generate_tag.outputs.sha }} \
             -f .docker/development/Dockerfile.api .
 
+      - name: Build da imagem Docker DATABASE
+        run: |
+          docker build -t mcsl9/projeto-docker-database:${{ steps.generate_tag.outputs.sha }} \
+            -f .docker/development/Dockerfile.postgres .
+
       - name: Push da imagem Docker API para o DockerHub
         run: docker push mcsl9/projeto-docker-api:${{ steps.generate_tag.outputs.sha }}
+
+      - name: Push da imagem Docker DATABASE para o DockerHub
+        run: docker push mcsl9/projeto-docker-database:${{ steps.generate_tag.outputs.sha }}
