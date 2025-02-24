@@ -9,3 +9,7 @@ CREATE TABLE todo (
   created_at         TIMESTAMP        DEFAULT NOW(),
   updated_at         TIMESTAMP        DEFAULT NOW()
 );
+
+COPY todo(id, description, is_active)
+    FROM '/fixtures/000001/todo.csv'
+    DELIMITER ';' csv header;
