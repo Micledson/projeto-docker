@@ -30,7 +30,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Baixar dependências
-        run: go mod
+        run: go mod tidy
 
       - name: Executar testes
         run: go test -v ./...
