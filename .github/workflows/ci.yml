@@ -60,7 +60,7 @@ jobs:
       - name: Build da imagem Docker API
         run: |
           docker build -t mcsl9/projeto-docker-api:${{ steps.generate_tag.outputs.sha }} \
-            -f .dockerfile/development/Dockerfile.api .
+            -f .docker/development/Dockerfile.api .
 
       - name: Push da imagem Docker API para o DockerHub
         run: docker push mcsl9/projeto-docker-api:${{ steps.generate_tag.outputs.sha }}
