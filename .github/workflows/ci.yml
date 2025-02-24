@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: 'Build and Push'
+    runs-on: ${{ matrix.os }}
+    outputs:
+      docker_tag: ${{ steps.generate_tag.outputs.sha }}
+
+    strategy:
+      matrix:
+        go-version: [1.20]
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Checkout do código-fonte
+        uses: actions/checkout@v4
+
+      - name: Configurar Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Baixar dependências
+        run: go mod download
+
+      - name: Executar testes
+        run: go test -v ./...
+
+      - name: Build da aplicação
+        run: go build -o myapp .
+
+      - name: Gerar Tag
+        id: generate_tag
+        run: |
+          SHA=$(echo $GITHUB_SHA | head -c7)
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
