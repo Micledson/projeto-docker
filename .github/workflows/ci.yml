@@ -57,8 +57,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build da imagem Docker
-        run: docker build -t mcsl9/projeto-docker:${{ steps.generate_tag.outputs.sha }} .
+      - name: Build da imagem Docker API
+        run: |
+          docker build -t mcsl9/projeto-docker-api:${{ steps.generate_tag.outputs.sha }} \
+            -f .dockerfile/development/Dockerfile.api .
 
-      - name: Push da imagem Docker para o DockerHub
-        run: docker push mcsl9/projeto-docker:${{ steps.generate_tag.outputs.sha }}
+      - name: Push da imagem Docker API para o DockerHub
+        run: docker push mcsl9/projeto-docker-api:${{ steps.generate_tag.outputs.sha }}
