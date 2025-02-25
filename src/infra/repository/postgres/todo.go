@@ -22,6 +22,7 @@ func NewTodoRepository() adapters.TodoAdapter {
 func (r *todoRepository) List() ([]todo.Todo, errors.Error) {
 	rows, err := repository.Queryx(query.Todo().Select().All())
 	if err != nil {
+		fmt.Println("err1: ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -32,6 +33,7 @@ func (r *todoRepository) List() ([]todo.Todo, errors.Error) {
 		rows.MapScan(serializedTodo)
 		todo, err := newTodoFromMapRows(serializedTodo)
 		if err != nil {
+			fmt.Println("err2: ", err)
 			return nil, err
 		}
 		todos = append(todos, todo)
