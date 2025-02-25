@@ -105,6 +105,7 @@ func (r *todoRepository) ChangeStatus(newTodo todo.Todo) errors.Error {
 func newTodoFromMapRows(data map[string]interface{}) (todo.Todo, errors.Error) {
 	var id uuid.UUID
 	if parsedID, err := uuid.Parse(string(data["id"].([]uint8))); err != nil {
+		fmt.Println("erro massa:", err)
 		return nil, errors.NewUnexpected()
 	} else {
 		id = parsedID
