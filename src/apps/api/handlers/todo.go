@@ -41,7 +41,7 @@ func (t todo) List(context RichContext) error {
 		return response.ErrorBuilder().NewFromDomain(err)
 	}
 
-	var serializedTodos []response.Todo
+	serializedTodos := make([]response.Todo, 0)
 	for _, todo := range todos {
 		serializedTodos = append(serializedTodos, *response.TodoBuilder().BuildFromDomain(todo))
 	}
@@ -69,7 +69,7 @@ func (t todo) GetByID(context RichContext) error {
 
 	_todo, err := t.service.FindByID(*id)
 	if err != nil {
-		response.ErrorBuilder().NewFromDomain(err)
+		return response.ErrorBuilder().NewFromDomain(err)
 	}
 
 	return context.JSON(http.StatusOK, *response.TodoBuilder().BuildFromDomain(_todo))
@@ -90,27 +90,27 @@ func (t todo) GetByID(context RichContext) error {
 func (t todo) Create(context RichContext) error {
 	var requestDto request.Todo
 	if bindErr := context.Bind(&requestDto); bindErr != nil {
-		response.ErrorBuilder().NewUnsupportedMediaTypeError()
+		return response.ErrorBuilder().NewUnsupportedMediaTypeError()
 	}
 	todoDomain, dtoErr := requestDto.ToDomain()
 	if dtoErr != nil {
-		response.ErrorBuilder().NewFromDomain(dtoErr)
+		return response.ErrorBuilder().NewFromDomain(dtoErr)
 	}
 	_todo, err := t.service.Create(todoDomain)
 	if err != nil {
-		response.ErrorBuilder().NewFromDomain(err)
+		return response.ErrorBuilder().NewFromDomain(err)
 	}
 
 	return context.JSON(http.StatusOK, response.TodoBuilder().BuildFromDomain(_todo))
 }
 
 // Update
-// @ID Todo.Create
+// @ID Todo.Update
 // @Summary Atualização do ToDo.
 // @Description Esta rota Atualiza a descrição de um ToDo.
 // @Tags Todo
 // @Param id path string  true  "UUID de um ToDo"
-// @Param json body request.Todo true "Parametros necessários para inserir um ToDo."
+// @Param json body request.UpdateTodo true "Parametros necessários para inserir um ToDo."
 // @Success 204 "Requisição realizada com sucesso"
 // @Failure 422 {object} response.ErrorMessage "Algum dos dados informados não pôde ser processado. Verifique os dados fornecidos."
 // @Failure 500 {object} response.ErrorMessage "Ocorreu um erro inesperado. Por favor, contate o suporte."
@@ -122,19 +122,18 @@ func (t todo) Update(context RichContext) error {
 		return valErr
 	}
 
-	var requestDto request.Todo
+	var requestDto request.UpdateTodo
 	if bindErr := context.Bind(&requestDto); bindErr != nil {
-		response.ErrorBuilder().NewUnsupportedMediaTypeError()
+		return response.ErrorBuilder().NewUnsupportedMediaTypeError()
 	}
 
-	requestDto.ID = *id
 	todoDomain, dtoErr := requestDto.ToDomain()
 	if dtoErr != nil {
-		response.ErrorBuilder().NewFromDomain(dtoErr)
+		return response.ErrorBuilder().NewFromDomain(dtoErr)
 	}
-	err := t.service.Update(todoDomain)
+	err := t.service.Update(*id, todoDomain)
 	if err != nil {
-		response.ErrorBuilder().NewFromDomain(err)
+		return response.ErrorBuilder().NewFromDomain(err)
 	}
 
 	return context.NoContent(http.StatusNoContent)
@@ -159,7 +158,7 @@ func (t todo) RestoreToDo(context RichContext) error {
 
 	err := t.service.EnableToDo(*id)
 	if err != nil {
-		response.ErrorBuilder().NewFromDomain(err)
+		return response.ErrorBuilder().NewFromDomain(err)
 	}
 
 	return context.NoContent(http.StatusNoContent)
@@ -184,7 +183,7 @@ func (t todo) DeleteToDo(context RichContext) error {
 
 	err := t.service.DisableToDo(*id)
 	if err != nil {
-		response.ErrorBuilder().NewFromDomain(err)
+		return response.ErrorBuilder().NewFromDomain(err)
 	}
 
 	return context.NoContent(http.StatusNoContent)

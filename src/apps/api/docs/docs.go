@@ -210,7 +210,7 @@ const docTemplate = `{
                     "Todo"
                 ],
                 "summary": "Atualização do ToDo.",
-                "operationId": "Todo.Create",
+                "operationId": "Todo.Update",
                 "parameters": [
                     {
                         "type": "string",
@@ -225,7 +225,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.Todo"
+                            "$ref": "#/definitions/request.UpdateTodo"
                         }
                     }
                 ],
@@ -302,11 +302,16 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "string"
-                },
                 "is_active": {
                     "type": "boolean"
+                }
+            }
+        },
+        "request.UpdateTodo": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
                 }
             }
         },

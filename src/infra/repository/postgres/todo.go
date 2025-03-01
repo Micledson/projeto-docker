@@ -10,20 +10,22 @@ import (
 	"projeto-docker/src/infra/repository"
 	"projeto-docker/src/infra/repository/postgres/query"
 	"strconv"
+	"time"
 )
 
-type todoRepository struct {
-}
+type todoRepository struct{}
 
 func NewTodoRepository() adapters.TodoAdapter {
 	return &todoRepository{}
 }
 
+var todosList []todo.Todo
+
 func (r *todoRepository) List() ([]todo.Todo, errors.Error) {
 	rows, err := repository.Queryx(query.Todo().Select().All())
 	if err != nil {
-		fmt.Println("err1: ", err)
-		return nil, err
+		return todosList, nil
+		//return nil, err
 	}
 	defer rows.Close()
 
@@ -33,8 +35,8 @@ func (r *todoRepository) List() ([]todo.Todo, errors.Error) {
 		rows.MapScan(serializedTodo)
 		todo, err := newTodoFromMapRows(serializedTodo)
 		if err != nil {
-			fmt.Println("err2: ", err)
-			return nil, err
+			return todosList, nil
+			//return nil, err
 		}
 		todos = append(todos, todo)
 	}
@@ -44,13 +46,19 @@ func (r *todoRepository) List() ([]todo.Todo, errors.Error) {
 func (r *todoRepository) FetchByID(id uuid.UUID) (todo.Todo, errors.Error) {
 	rows, err := repository.Queryx(query.Todo().Select().FindByID(), id)
 	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+		for _, _todo := range todosList {
+			if *_todo.ID() == id {
+				return _todo, nil
+			}
 
-	if !rows.Next() {
-		return nil, errors.NewNotFound("Todo not found")
+		}
+		//return nil, err
 	}
+	//defer rows.Close()
+
+	//if !rows.Next() {
+	return nil, errors.NewNotFound("Todo not found")
+	//}
 
 	var serializedTodo = map[string]interface{}{}
 	rows.MapScan(serializedTodo)
@@ -66,7 +74,19 @@ func (r *todoRepository) FetchByID(id uuid.UUID) (todo.Todo, errors.Error) {
 func (r *todoRepository) Insert(newTodo todo.Todo) (todo.Todo, errors.Error) {
 	rows, err := repository.Queryx(query.Todo().Insert().Insert(), newTodo.Description(), newTodo.IsActive())
 	if err != nil {
-		return nil, err
+		now := time.Now()
+		todoBuild, buildErr := todo.NewBuilder().
+			WithID(uuid.New()).
+			WithDescription(newTodo.Description()).
+			WithIsActive(newTodo.IsActive()).
+			WithCreatedAt(&now).
+			WithUpdatedAt(&now).
+			Build()
+		if buildErr != nil {
+			return nil, buildErr
+		}
+		todosList = append(todosList, todoBuild)
+		return todoBuild, nil
 	}
 	defer rows.Close()
 
@@ -84,10 +104,28 @@ func (r *todoRepository) Insert(newTodo todo.Todo) (todo.Todo, errors.Error) {
 	return _todo, nil
 }
 
-func (r *todoRepository) Update(newTodo todo.Todo) errors.Error {
+func (r *todoRepository) Update(id uuid.UUID, newTodo todo.Todo) errors.Error {
 	_, err := repository.Queryx(query.Todo().Update().Update(), newTodo.Description(), newTodo.ID())
 	if err != nil {
-		return err
+		for index, _todo := range todosList {
+			fmt.Println(_todo.ID())
+			fmt.Println(id)
+			if *_todo.ID() == id {
+				now := time.Now()
+				todoBuild, buildErr := todo.NewBuilder().
+					WithID(id).
+					WithDescription(newTodo.Description()).
+					WithIsActive(_todo.IsActive()).
+					WithCreatedAt(_todo.CreatedAt()).
+					WithUpdatedAt(&now).
+					Build()
+				if buildErr != nil {
+					return buildErr
+				}
+				todosList = append(todosList[:index], append([]todo.Todo{todoBuild}, todosList[index+1:]...)...)
+			}
+		}
+		//return err
 	}
 
 	return nil
@@ -96,7 +134,27 @@ func (r *todoRepository) Update(newTodo todo.Todo) errors.Error {
 func (r *todoRepository) ChangeStatus(newTodo todo.Todo) errors.Error {
 	_, err := repository.Queryx(query.Todo().Update().ChangeStatus(), newTodo.IsActive(), newTodo.ID())
 	if err != nil {
-		return err
+		for index, _todo := range todosList {
+			fmt.Println(_todo.ID())
+			fmt.Println(newTodo.ID())
+			fmt.Println(newTodo.ID() == _todo.ID())
+
+			if *_todo.ID() == *newTodo.ID() {
+				now := time.Now()
+				todoBuild, buildErr := todo.NewBuilder().
+					WithID(*newTodo.ID()).
+					WithDescription(_todo.Description()).
+					WithIsActive(newTodo.IsActive()).
+					WithCreatedAt(_todo.CreatedAt()).
+					WithUpdatedAt(&now).
+					Build()
+				if buildErr != nil {
+					return buildErr
+				}
+				todosList = append(todosList[:index], append([]todo.Todo{todoBuild}, todosList[index+1:]...)...)
+			}
+		}
+		//return err
 	}
 
 	return nil

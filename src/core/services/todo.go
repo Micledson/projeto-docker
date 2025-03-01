@@ -28,8 +28,8 @@ func (s *todoService) Create(newTodo todo.Todo) (todo.Todo, errors.Error) {
 	return s.adapter.Insert(newTodo)
 }
 
-func (s *todoService) Update(newTodo todo.Todo) errors.Error {
-	return s.adapter.Update(newTodo)
+func (s *todoService) Update(id uuid.UUID, newTodo todo.Todo) errors.Error {
+	return s.adapter.Update(id, newTodo)
 }
 
 func (s *todoService) EnableToDo(id uuid.UUID) errors.Error {

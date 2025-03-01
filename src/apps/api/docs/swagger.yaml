@@ -4,10 +4,13 @@ definitions:
     properties:
       description:
         type: string
-      id:
-        type: string
       is_active:
         type: boolean
+    type: object
+  request.UpdateTodo:
+    properties:
+      description:
+        type: string
     type: object
   response.ErrorMessage:
     properties:
@@ -178,7 +181,7 @@ paths:
       - Todo
     put:
       description: Esta rota Atualiza a descrição de um ToDo.
-      operationId: Todo.Create
+      operationId: Todo.Update
       parameters:
       - description: UUID de um ToDo
         in: path
@@ -190,7 +193,7 @@ paths:
         name: json
         required: true
         schema:
-          $ref: '#/definitions/request.Todo'
+          $ref: '#/definitions/request.UpdateTodo'
       responses:
         "204":
           description: Requisição realizada com sucesso
