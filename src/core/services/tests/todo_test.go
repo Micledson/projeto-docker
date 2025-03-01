@@ -1,6 +1,7 @@
 package tests
 
 import (
+	mock_adapters "projeto-docker/src/core/services/tests/mocks"
 	"testing"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	"projeto-docker/src/core/domain/errors"
 	"projeto-docker/src/core/domain/todo"
 	core "projeto-docker/src/core/services"
-	mock_adapters "projeto-docker/src/core/services/tests/mocks"
 )
 
 func TestList(t *testing.T) {
@@ -151,10 +151,10 @@ func TestUpdate(t *testing.T) {
 			WithUpdatedAt(&now).
 			Build()
 
-		IAdapter.EXPECT().Update(updateTodo).Return(nil)
+		IAdapter.EXPECT().Update(id, updateTodo).Return(nil)
 
 		s := core.NewTodoService(IAdapter)
-		err := s.Update(updateTodo)
+		err := s.Update(id, updateTodo)
 		assert.Nil(t, err)
 	})
 
@@ -171,10 +171,10 @@ func TestUpdate(t *testing.T) {
 			Build()
 
 		expectedErr := errors.NewFromString("Erro ao atualizar")
-		IAdapter.EXPECT().Update(updateTodo).Return(expectedErr)
+		IAdapter.EXPECT().Update(id, updateTodo).Return(expectedErr)
 
 		s := core.NewTodoService(IAdapter)
-		err := s.Update(updateTodo)
+		err := s.Update(id, updateTodo)
 		assert.NotNil(t, err)
 		assert.Equal(t, expectedErr, err)
 	})
